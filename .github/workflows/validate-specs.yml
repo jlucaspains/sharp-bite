@@ -1,0 +1,47 @@
+name: Validate Specs
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "specs/**/*.md"
+
+jobs:
+  validate:
+    name: Validate spec frontmatter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed spec files
+        id: changed
+        run: |
+          git diff --name-only --diff-filter=AM \
+            "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" \
+            -- 'specs/' \
+            | grep '\.md$' > /tmp/changed-specs.txt || true
+
+          if [ -s /tmp/changed-specs.txt ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changed specs:"
+            cat /tmp/changed-specs.txt
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No spec files changed."
+          fi
+
+      - name: Validate spec frontmatter
+        if: steps.changed.outputs.has_changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x .github/scripts/validate-specs.sh
+          xargs .github/scripts/validate-specs.sh < /tmp/changed-specs.txt
