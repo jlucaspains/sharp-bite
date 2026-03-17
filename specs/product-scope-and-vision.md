@@ -1,10 +1,12 @@
-# SharpBite – Product Scope & Vision
-
-> **Version:** 1.0
-> **Date:** 2026-03-16
-> **Status:** Draft
-
 ---
+title: "Product Scope and Vision"
+work-item-url: https://github.com/jlucaspains/sharp-bite/issues/65
+status: draft
+authors: lpains
+version: 1.0
+---
+
+# SharpBite – Product Scope & Vision
 
 ## 1. Vision Statement
 
